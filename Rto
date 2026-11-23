@@ -1,0 +1,476 @@
+-- ==========================================
+-- CONFIGURATION & SERVICES
+-- ==========================================
+local CorrectKey = "whoyyrizx@pro#2026"
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- ลบ UI เก่าหากมีการรันซ้ำ
+if PlayerGui:FindFirstChild("CustomMonochromeHub") then
+    PlayerGui.CustomMonochromeHub:Destroy()
+end
+
+-- ==========================================
+-- 1. สร้าง SCREEN GUI หลัก
+-- ==========================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CustomMonochromeHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- ฟังก์ชันช่วยสร้างมุมโค้งและขอบขาว
+local function StyleFrame(frame, cornerRadius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, cornerRadius or 8)
+    corner.Parent = frame
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 1.5
+    stroke.Parent = frame
+end
+
+-- ==========================================
+-- 2. หน้าต่าง KEY SYSTEM (ใส่รหัสก่อนเข้าใช้งาน)
+-- ==========================================
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Size = UDim2.new(0, 320, 0, 180)
+KeyFrame.Position = UDim2.new(0.5, -160, 0.5, -90)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+KeyFrame.Parent = ScreenGui
+StyleFrame(KeyFrame, 10)
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 45)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Text = "ใส่รหัสก่อนนะค้าบเตงง"
+KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.TextSize = 16
+KeyTitle.Parent = KeyFrame
+
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(0.85, 0, 0, 38)
+KeyBox.Position = UDim2.new(0.075, 0, 0.32, 0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+KeyBox.Text = ""
+KeyBox.PlaceholderText = "กรอกรหัสผ่านที่นี่..."
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextSize = 14
+KeyBox.ClearTextOnFocus = false
+KeyBox.Parent = KeyFrame
+StyleFrame(KeyBox, 6)
+
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Size = UDim2.new(0.85, 0, 0, 38)
+SubmitBtn.Position = UDim2.new(0.075, 0, 0.65, 0)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.Text = "ยืนยันรหัส"
+SubmitBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.TextSize = 14
+SubmitBtn.Parent = KeyFrame
+StyleFrame(SubmitBtn, 6)
+
+-- ==========================================
+-- 3. หน้าต่าง MAIN GUI (ขนาดกลาง ดำ-ขาว) & ปุ่มย่อ
+-- ==========================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 420, 0, 340)
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -170)
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+StyleFrame(MainFrame, 12)
+
+-- ปุ่มลอยสำหรับกดเปิด/ปิด GUI (ย่อเป็นปุ่มเดียว)
+local ToggleGuiBtn = Instance.new("TextButton")
+ToggleGuiBtn.Name = "MiniButton"
+ToggleGuiBtn.Size = UDim2.new(0, 45, 0, 45)
+ToggleGuiBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+ToggleGuiBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleGuiBtn.Text = "MENU"
+ToggleGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleGuiBtn.Font = Enum.Font.GothamBold
+ToggleGuiBtn.TextSize = 11
+ToggleGuiBtn.Visible = false
+ToggleGuiBtn.Active = true
+ToggleGuiBtn.Draggable = true
+ToggleGuiBtn.Parent = ScreenGui
+StyleFrame(ToggleGuiBtn, 25)
+
+-- แถบด้านบนของ MainFrame
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopBar.Parent = MainFrame
+StyleFrame(TopBar, 10)
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+TitleLabel.Position = UDim2.new(0.04, 0, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "WHOYYRIZX PRO HUB"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 14
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TopBar
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -38, 0.5, -15)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 18
+MinimizeBtn.Parent = TopBar
+StyleFrame(MinimizeBtn, 6)
+
+-- ระบบย่อ / ขยายหน้าต่าง
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    ToggleGuiBtn.Visible = true
+end)
+
+ToggleGuiBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ToggleGuiBtn.Visible = false
+end)
+
+-- พื้นที่เลื่อนสำหรับใส่ปุ่มฟังก์ชันต่างๆ
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Size = UDim2.new(0.94, 0, 0.82, 0)
+ScrollFrame.Position = UDim2.new(0.03, 0, 0.15, 0)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.ScrollBarThickness = 4
+ScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 520)
+ScrollFrame.Parent = MainFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ScrollFrame
+
+-- ฟังก์ชันสร้างปุ่มมาตรฐานใน ScrollFrame
+local function CreateButton(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.98, 0, 0, 38)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 13
+    btn.Parent = ScrollFrame
+    StyleFrame(btn, 6)
+    
+    btn.MouseButton1Click:Connect(function()
+        callback(btn)
+    end)
+    return btn
+end
+
+-- ==========================================
+-- 4. ฟังก์ชันการทำงานทั้งหมด
+-- ==========================================
+
+-- [ฟังก์ชัน 1] เร่งสปีดเฉพาะตอนกระโดดแล้วเดิน (Bunny Hop / CNP Style)
+local JumpSpeedEnabled = false
+local JumpBoostSpeed = 48 -- ปรับความเร็วตอนลอยกลางอากาศได้ที่นี่
+
+CreateButton("เร่งสปีดตอนกระโดด (CNP Speed): ปิด", function(btn)
+    JumpSpeedEnabled = not JumpSpeedEnabled
+    if JumpSpeedEnabled then
+        btn.Text = "เร่งสปีดตอนกระโดด (CNP Speed): เปิด"
+        btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    else
+        btn.Text = "เร่งสปีดตอนกระโดด (CNP Speed): ปิด"
+        btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if JumpSpeedEnabled then
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        
+        if hum and root then
+            local state = hum:GetState()
+            -- เช็คว่าตัวละครกำลังลอย (กระโดด หรือ กำลังร่วง) และมีการกดเดิน (MoveDirection > 0)
+            if (state == Enum.HumanoidStateType.Jumping or state == Enum.HumanoidStateType.Freefall) and hum.MoveDirection.Magnitude > 0 then
+                root.Velocity = Vector3.new(
+                    hum.MoveDirection.X * JumpBoostSpeed,
+                    root.Velocity.Y,
+                    hum.MoveDirection.Z * JumpBoostSpeed
+                )
+            end
+        end
+    end
+end)
+
+-- [ฟังก์ชัน 2] เสกไอเทมบินได้ (ถือไอเทมแล้วกดคลิกค้างหรือกดใช้เพื่อบิน)
+local Flying = false
+local FlySpeed = 60
+
+CreateButton("รับไอเทมบิน (Fly Item)", function(btn)
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    if not backpack then return end
+    if backpack:FindFirstChild("MagicFlyWand") or (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("MagicFlyWand")) then
+        btn.Text = "คุณมีไอเทมบินอยู่ในกระเป๋าแล้ว!"
+        task.wait(1.5)
+        btn.Text = "รับไอเทมบิน (Fly Item)"
+        return
+    end
+
+    -- สร้าง Tool จำลองขึ้นมาในกระเป๋า
+    local tool = Instance.new("Tool")
+    tool.Name = "MagicFlyWand"
+    tool.RequiresHandle = true
+
+    local handle = Instance.new("Part")
+    handle.Name = "Handle"
+    handle.Size = Vector3.new(0.6, 0.6, 2.5)
+    handle.Color = Color3.fromRGB(255, 255, 255)
+    handle.Material = Enum.Material.Neon
+    handle.Parent = tool
+
+    local bv, bg
+    tool.Equipped:Connect(function()
+        Flying = true
+        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if root then
+            bv = Instance.new("BodyVelocity")
+            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            bv.Velocity = Vector3.new(0, 0, 0)
+            bv.Parent = root
+
+            bg = Instance.new("BodyGyro")
+            bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            bg.P = 9e4
+            bg.Parent = root
+
+            task.spawn(function()
+                while Flying and root and bv and bg do
+                    RunService.RenderStepped:Wait()
+                    local cam = workspace.CurrentCamera
+                    local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                    bg.CFrame = cam.CFrame
+                    if hum and hum.MoveDirection.Magnitude > 0 then
+                        bv.Velocity = cam.CFrame.LookVector * FlySpeed
+                    else
+                        bv.Velocity = Vector3.new(0, 0.1, 0) -- ลอยนิ่งกลางอากาศ
+                    end
+                end
+            end)
+        end
+    end)
+
+    tool.Unequipped:Connect(function()
+        Flying = false
+        if bv then bv:Destroy() end
+        if bg then bg:Destroy() end
+    end)
+
+    tool.Parent = backpack
+    btn.Text = "เสกไอเทมสำเร็จ! (ดูในช่องเก็บของ)"
+    task.wait(2)
+    btn.Text = "รับไอเทมบิน (Fly Item)"
+end)
+
+-- [ฟังก์ชัน 3] เปลี่ยนอวาตาร์เป็นผู้เล่นคนอื่น (พิมพ์ @ชื่อผู้เล่น)
+local AvatarContainer = Instance.new("Frame")
+AvatarContainer.Size = UDim2.new(0.98, 0, 0, 42)
+AvatarContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+AvatarContainer.Parent = ScrollFrame
+StyleFrame(AvatarContainer, 6)
+
+local UsernameBox = Instance.new("TextBox")
+UsernameBox.Size = UDim2.new(0.65, 0, 0.8, 0)
+UsernameBox.Position = UDim2.new(0.02, 0, 0.1, 0)
+UsernameBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+UsernameBox.Text = ""
+UsernameBox.PlaceholderText = "ใส่ชื่อ เช่น @oooo096741"
+UsernameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameBox.Font = Enum.Font.Gotham
+UsernameBox.TextSize = 12
+UsernameBox.Parent = AvatarContainer
+StyleFrame(UsernameBox, 5)
+
+local ApplyAvatarBtn = Instance.new("TextButton")
+ApplyAvatarBtn.Size = UDim2.new(0.28, 0, 0.8, 0)
+ApplyAvatarBtn.Position = UDim2.new(0.70, 0, 0.1, 0)
+ApplyAvatarBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ApplyAvatarBtn.Text = "ตกลง"
+ApplyAvatarBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+ApplyAvatarBtn.Font = Enum.Font.GothamBold
+ApplyAvatarBtn.TextSize = 12
+ApplyAvatarBtn.Parent = AvatarContainer
+StyleFrame(ApplyAvatarBtn, 5)
+
+ApplyAvatarBtn.MouseButton1Click:Connect(function()
+    local rawName = UsernameBox.Text
+    local cleanName = string.gsub(rawName, "@", "") -- ตัดเครื่องหมาย @ ออก
+    cleanName = string.gsub(cleanName, "%s+", "") -- ตัดช่องว่างออก
+
+    if cleanName == "" then return end
+    ApplyAvatarBtn.Text = "กำลังโหลด..."
+
+    local success, userId = pcall(function()
+        return Players:GetUserIdFromNameAsync(cleanName)
+    end)
+
+    if success and userId then
+        local descSuccess, humDesc = pcall(function()
+            return Players:GetHumanoidDescriptionFromUserId(userId)
+        end)
+
+        if descSuccess and humDesc and LocalPlayer.Character then
+            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                -- ลบเสื้อผ้าและเครื่องประดับเดิมก่อนสวมชุดใหม่
+                for _, v in pairs(LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Accessory") or v:IsA("Shirt") or v:IsA("Pants") or v:IsA("ShirtGraphic") then
+                        v:Destroy()
+                    end
+                end
+                hum:ApplyDescription(humDesc)
+                ApplyAvatarBtn.Text = "สำเร็จ!"
+            end
+        else
+            ApplyAvatarBtn.Text = "ผิดพลาด"
+        end
+    else
+        ApplyAvatarBtn.Text = "ไม่พบชื่อนี้"
+    end
+    task.wait(1.5)
+    ApplyAvatarBtn.Text = "ตกลง"
+end)
+
+-- [ฟังก์ชัน 4] เปลี่ยนท้องฟ้า (น่ารัก & สมจริง)
+local SkyPresets = {
+    {
+        Name = "ท้องฟ้าพาสเทลน่ารัก (Pastel Cute)",
+        Top = "rbxassetid://159454299", Bottom = "rbxassetid://159454296",
+        Left = "rbxassetid://159454286", Right = "rbxassetid://159454300",
+        Front = "rbxassetid://159454288", Back = "rbxassetid://159454293",
+        Ambient = Color3.fromRGB(255, 200, 230)
+    },
+    {
+        Name = "ท้องฟ้ายามเย็นสมจริง (Realistic Sunset)",
+        Top = "rbxassetid://401664881", Bottom = "rbxassetid://401664862",
+        Left = "rbxassetid://401664836", Right = "rbxassetid://401664852",
+        Front = "rbxassetid://401664810", Back = "rbxassetid://401664799",
+        Ambient = Color3.fromRGB(255, 170, 120)
+    },
+    {
+        Name = "ท้องฟ้ากลางคืนดวงดาว (Starry Night)",
+        Top = "rbxassetid://159839668", Bottom = "rbxassetid://159839657",
+        Left = "rbxassetid://159839642", Right = "rbxassetid://159839687",
+        Front = "rbxassetid://159839627", Back = "rbxassetid://159839610",
+        Ambient = Color3.fromRGB(120, 140, 200)
+    }
+}
+local CurrentSkyIndex = 0
+
+CreateButton("เปลี่ยนท้องฟ้า: ค่าเริ่มต้นของแมพ", function(btn)
+    CurrentSkyIndex = CurrentSkyIndex + 1
+    if CurrentSkyIndex > #SkyPresets then
+        CurrentSkyIndex = 0
+        for _, v in pairs(Lighting:GetChildren()) do
+            if v:IsA("Sky") then v:Destroy() end
+        end
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        btn.Text = "เปลี่ยนท้องฟ้า: ค่าเริ่มต้นของแมพ"
+        return
+    end
+
+    local preset = SkyPresets[CurrentSkyIndex]
+    for _, v in pairs(Lighting:GetChildren()) do
+        if v:IsA("Sky") then v:Destroy() end
+    end
+
+    local newSky = Instance.new("Sky")
+    newSky.SkyboxUp = preset.Top
+    newSky.SkyboxDn = preset.Bottom
+    newSky.SkyboxLf = preset.Left
+    newSky.SkyboxRt = preset.Right
+    newSky.SkyboxFt = preset.Front
+    newSky.SkyboxBk = preset.Back
+    newSky.Parent = Lighting
+    Lighting.OutdoorAmbient = preset.Ambient
+
+    btn.Text = "ท้องฟ้า: " .. preset.Name
+end)
+
+-- [ฟังก์ชัน 5] เปลี่ยนรูปไอคอน Shiftlock (ชินามอล / คุโรมิ / โดราเอม่อน)
+local ShiftlockIcons = {
+    {Name = "ชินนามอนโรล (Cinnamoroll)", Id = "rbxassetid://11419713314"},
+    {Name = "คุโรมิ (Kuromi)", Id = "rbxassetid://11419717822"},
+    {Name = "โดราเอม่อน (Doraemon)", Id = "rbxassetid://6071575925"}
+}
+local CurrentIconIndex = 0
+
+CreateButton("เปลี่ยนรูป Shiftlock: ค่าเริ่มต้น", function(btn)
+    CurrentIconIndex = CurrentIconIndex + 1
+    if CurrentIconIndex > #ShiftlockIcons then
+        CurrentIconIndex = 0
+        btn.Text = "เปลี่ยนรูป Shiftlock: ค่าเริ่มต้น"
+        return
+    end
+
+    local selected = ShiftlockIcons[CurrentIconIndex]
+    btn.Text = "Shiftlock: " .. selected.Name
+
+    -- ค้นหา ImageLabel ของ MouseLock ใน PlayerGui เพื่อเปลี่ยนรูป
+    task.spawn(function()
+        local mouseLock = PlayerGui:FindFirstChild("MouseLock", true) 
+            or PlayerGui:FindFirstChild("ShiftLock", true)
+        if mouseLock then
+            for _, obj in pairs(mouseLock:GetDescendants()) do
+                if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+                    obj.Image = selected.Id
+                end
+            end
+        end
+    end)
+end)
+
+-- ==========================================
+-- 5. ตรวจสอบรหัสผ่านเมื่อกดปุ่มยืนยัน
+-- ==========================================
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyBox.Text == CorrectKey then
+        SubmitBtn.Text = "รหัสถูกต้อง! กำลังเปิดเมนู..."
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+        task.wait(0.8)
+        KeyFrame:Destroy()
+        MainFrame.Visible = true
+    else
+        SubmitBtn.Text = "รหัสผิด! ลองใหม่อีกครั้ง"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+        KeyBox.Text = ""
+        task.wait(1.2)
+        SubmitBtn.Text = "ยืนยันรหัส"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end)
